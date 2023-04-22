@@ -1,9 +1,9 @@
 from functools import wraps
 from inspect import iscoroutinefunction
 
-
+#Used when registering commands
 commands_dict = {}
-
+#Decorator for creationg data in commands_dict
 def register_command(commands_list):
     def decorator(func):
         if not iscoroutinefunction(func):

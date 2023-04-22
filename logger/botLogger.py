@@ -1,5 +1,6 @@
 import logging
 
+#Setting logger
 class botLogger:
     def getLogger(name):
         
