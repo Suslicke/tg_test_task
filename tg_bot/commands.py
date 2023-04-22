@@ -15,12 +15,12 @@ logger = botLogger.getLogger(__name__)
 @register_command(["start"])
 async def start(message: types.Message):
     logger.warn(message.chat.id)
-    await message.answer("Привет! Я твой бот. Что бы узнать что я умею напиши /help")
+    await message.reply("Привет! Я твой бот. Что бы узнать что я умею напиши /help")
 
 
 @register_command(["help"])
 async def help(message: types.Message):
-    await message.answer(message.chat.id, f"/weather Город - Выведет данные о погоде на данный момент в городе, который вы выставили, желательно писать город на английском языке(/weather Moscow)\n/convert Сумма С какой валюты На какую валюту(/convert 100 USD RUB)\n/image - Просто выводит картинку с милыми животными\n/polls Вопрос,Ответ,Ответ,итд - Отделение Вопроса/Ответов друг от друга происходит через запятую")
+    await message.reply(message.chat.id, f"/weather Город - Выведет данные о погоде на данный момент в городе, который вы выставили, желательно писать город на английском языке(/weather Moscow)\n/convert Сумма С какой валюты На какую валюту(/convert 100 USD RUB)\n/image - Просто выводит картинку с милыми животными\n/polls Вопрос,Ответ,Ответ,итд - Отделение Вопроса/Ответов друг от друга происходит через запятую")
 
 
 @register_command(["weather"])
@@ -38,19 +38,19 @@ async def get_weather(message: types.Message):
         longitude = req_json['results'][0]['longitude']
         logger.warn(message.chat.id)
     except Exception:
-        return await message.answer(f"Город не найден, попробуйте еще раз в другом формате: /weather Город")
+        return await message.reply(f"Город не найден, попробуйте еще раз в другом формате: /weather Город")
     
     # Get weather
     base_url = f'https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true'
     response = requests.get(base_url)
     
     if response.status_code != 200:
-        return await message.answer(f"Произошла ошибка, попробуйте еще раз")
+        return await message.reply(f"Произошла ошибка, попробуйте еще раз")
     
     req_json = response.json()
     
 
-    return await message.answer(f"Город: {found_city}\nПогода сейчас: {weather_interpretation[req_json['current_weather']['weathercode']]}\nТемпература воздуха: {req_json['current_weather']['temperature']} °C\nСкорость ветра: {req_json['current_weather']['windspeed']} км/ч")
+    return await message.reply(f"Город: {found_city}\nПогода сейчас: {weather_interpretation[req_json['current_weather']['weathercode']]}\nТемпература воздуха: {req_json['current_weather']['temperature']} °C\nСкорость ветра: {req_json['current_weather']['windspeed']} км/ч")
 
 
 @register_command(["convert"])
@@ -70,13 +70,13 @@ async def convert_money(message: types.Message):
         response = requests.request("GET", url, headers=headers)
         
         if response.status_code != 200:
-            return await message.answer(f"Произошла ошибка, попробуйте еще раз")
+            return await message.reply(f"Произошла ошибка, попробуйте еще раз")
         
         result = response.json()
-        return await message.answer(f"Конвертация из {amount} {from_currency} в {to_currency}\nКурс 1 {from_currency} к {to_currency} = {result['info']['rate']}\nРезультат: {round(result['result'],2)} {to_currency}")
+        return await message.reply(f"Конвертация из {amount} {from_currency} в {to_currency}\nКурс 1 {from_currency} к {to_currency} = {result['info']['rate']}\nРезультат: {round(result['result'],2)} {to_currency}")
     
     except Exception:
-        return await message.answer(f"Валюта не найдена, произошла ошибка, попробуйте ещё раз")
+        return await message.reply(f"Валюта не найдена, произошла ошибка, попробуйте ещё раз")
 
     
 
@@ -99,14 +99,14 @@ async def image_send(message: types.Message):
         
         if response.status_code != 200:
             if response.status_code == 522:
-                return await message.answer(f"Произошла ошибка с запросом, обратитесь к разработчикам")
-            return await message.answer(f"Произошла ошибка, попробуйте еще раз")
+                return await message.reply(f"Произошла ошибка с запросом, обратитесь к разработчикам")
+            return await message.reply(f"Произошла ошибка, попробуйте еще раз")
                 
         result = response.json()
 
-        return await message.answer(result['photos'][0]['src']['original'], disable_web_page_preview = False)
+        return await message.reply(result['photos'][0]['src']['original'], disable_web_page_preview = False)
     except Exception:
-        return await message.answer(f"Картинка не найдена, повторите попытку")
+        return await message.reply(f"Картинка не найдена, повторите попытку")
 
 
 async def send_poll(chat_id, question, options):
@@ -128,7 +128,7 @@ async def create_polls(message: types.Message):
     try:
         return await send_poll(chat_id=chat_id, question=question, options=options)
     except Exception as e:
-        return await message.answer(f"Не удалось создать опрос, попробуйте еще раз {e}")
+        return await message.reply(f"Не удалось создать опрос, попробуйте еще раз {e}")
 
 
 #Registration all of the func
