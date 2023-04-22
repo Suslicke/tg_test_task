@@ -2,7 +2,7 @@ from aiogram import types
 from logger.botLogger import botLogger
 import requests
 # from tg_bot.bot import send_poll
-from tg_bot.bot import bot
+from tg_bot.bot import bot, dp
 from const import weather_interpretation
 from config import PEXELS_API_KEY, CONVERSION_API
 import random
@@ -14,13 +14,12 @@ logger = botLogger.getLogger(__name__)
 
 @register_command(["start"])
 async def start(message: types.Message):
-    logger.warn(message.chat.id)
     await message.reply("Привет! Я твой бот. Что бы узнать что я умею напиши /help")
 
 
 @register_command(["help"])
 async def help(message: types.Message):
-    await message.reply(message.chat.id, f"/weather Город - Выведет данные о погоде на данный момент в городе, который вы выставили, желательно писать город на английском языке(/weather Moscow)\n/convert Сумма С какой валюты На какую валюту(/convert 100 USD RUB)\n/image - Просто выводит картинку с милыми животными\n/polls Вопрос,Ответ,Ответ,итд - Отделение Вопроса/Ответов друг от друга происходит через запятую, последним должен быть id приватного чата/группового чата")
+    await message.reply(f"/weather Город - Выведет данные о погоде на данный момент в городе, который вы выставили, желательно писать город на английском языке(/weather Moscow)\n/convert Сумма С какой валюты На какую валюту(/convert 100 USD RUB)\n/image - Просто выводит картинку с милыми животными\n/polls Вопрос,Ответ,Ответ,итд - Отделение Вопроса/Ответов друг от друга происходит через запятую, последним должен быть id приватного чата/группового чата(по стандарту это текущий чат)")
 
 
 @register_command(["weather"])
@@ -36,7 +35,6 @@ async def get_weather(message: types.Message):
         found_city = req_json['results'][0]['name']
         latitude = req_json['results'][0]['latitude']
         longitude = req_json['results'][0]['longitude']
-        logger.warn(message.chat.id)
     except Exception:
         return await message.reply(f"Город не найден, попробуйте еще раз в другом формате: /weather Город")
     
@@ -123,8 +121,12 @@ async def create_polls(message: types.Message):
     #Parse split string and add options
     for option in parse_polls: options.append(option) if option != parse_polls[0] else None
     chat_id = options[-1]
-    logger.warn(chat_id)
     options.remove(chat_id)
+    try:
+        chat_id = int(chat_id)
+    except ValueError:
+        chat_id = message.chat.id
+
     try:
         return await send_poll(chat_id=chat_id, question=question, options=options)
     except Exception as e:
