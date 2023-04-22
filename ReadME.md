@@ -1,6 +1,6 @@
 Telegram bot V 1.0
 Step for start up bot
-- tested on python 3.10.5
+> tested on python 3.10.5
 create venv by command:
 ```
 python3 -m venv venv
